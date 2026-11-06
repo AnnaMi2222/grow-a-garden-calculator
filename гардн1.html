@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grow a Garden Pets Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 850px;
+            width: 100%;
+        }
+        input[type="text"] {
+            width: 60%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        /* РОЗДІЛЕННЯ НА ДВІ КОЛОНКИ */
+        .workspace {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 30px;
+            margin-top: 25px;
+            max-height: 500px;
+        }
+        .mutations-box {
+            display: none;
+            text-align: left;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            flex: 1.2;
+            max-height: 100%;
+            overflow-y: auto;
+        }
+        .mutations-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .mutation-item {
+            margin: 6px 0;
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+            font-weight: bold;
+        }
+        .mutation-item input {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        .result-box {
+            flex: 1.8;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+        .result {
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1.5;
+        }
+        .success { color: #2e7d32; }
+        .error { color: #c62828; }
+        .price-tag {
+            display: block;
+            margin-top: 12px;
+            color: #1565c0;
+            font-size: 19px;
+            background-color: #e3f2fd;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 5px solid #1565c0;
+        }
+
+        /* Стилі для кольорових назв мутацій зліва */
+        .m-alien-shard { color: #00ccaa; }
+        .m-alien-weather { color: #20b2aa; }
+        .m-ascended { color: #ff007f; }
+        .m-aurora { color: #00aaaa; }
+        .m-cleansing { color: #00b0b0; }
+        .m-corrupted { color: #9400d3; }
+        .m-dawnbound { color: #ff7f50; }
+        .m-everchanted { color: #da70d6; }
+        .m-exalted { color: #ba55d3; }
+        .m-forger { color: #ff4500; }
+        .m-frozen { color: #1e90ff; }
+        .m-gigantic { color: #cd5c5c; }
+        .m-hyperhunger { color: #cc0000; }
+        .m-inverted { color: #708090; }
+        .m-iridescent { color: #ff00ff; }
+        .m-ironskin { color: #506070; }
+        .m-jumbo { color: #4682b4; }
+        .m-mega { color: #ff1493; }
+        .m-nightmare { color: #8b0000; }
+        .m-nocturnal { color: #191970; }
+        .m-nutty { color: #d2691e; }
+        .m-radiant { color: #b8860b; }
+        .m-royaljelly { color: #ffaa00; }
+        .m-shiny { color: #888888; }
+        .m-tiny { color: #40a0a0; }
+        .m-transcendent { color: #9370db; }
+        .m-ufo { color: #32cd32; }
+        .m-venom { color: #228b22; }
+        .m-windy { color: #6080a0; }
+                /* Кольори для мутацій на літеру G */
+        .m-galactic { color: #4b0082; } /* Глибокий індиго */
+        .m-giantbean { color: #2e8b57; } /* Зелений бобовий */
+        .m-glimmering { color: #ffd700; } /* Яскраво-золотий спалах */
+        .m-gold { color: #daa520; } /* Класичне золото */
+        .m-golden { color: #b8860b; } /* Темно-золотистий */
+
+   </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Grow a Garden Pets Calculator <div style="margin-bottom: 15px;">
+    <a href="index.html" style="color: #4CAF50; text-decoration: none; font-weight: bold; margin-right: 15px;">Калькулятор</a>
+    <a href="about.html" style="color: #1565c0; text-decoration: none; font-weight: bold;">Про нас</a>
+</div></h2>
+    <p>Enter the pet's name:</p>
+    
+    <input type="text" id="petInput" placeholder="For example: a frog, a bunny, a kitsune...">
+    <br>
+    <br>
+<label style="font-weight: bold;">Вік пета (років): </label>
+<input type="number" id="petAge" value="0" min="0" style="width: 85px; padding: 8px; margin: 10px 5px; border: 2px solid #ccc; border-radius: 6px; font-size: 16px;">
+
+<label style="font-weight: bold; margin-left: 15px;">Вага пета (кг): </label>
+<input type="number" id="petWeight" value="0" min="0" style="width: 85px; padding: 8px; margin: 10px 5px; border: 2px solid #ccc; border-radius: 6px; font-size: 16px;">
+
+    <button onclick="checkPet()">Find a pet</button>
+
+    <div class="workspace">
+        <div id="mutationsContainer" class="mutations-box">
+            <div class="mutations-title">Select your pet's mutations (you can choose several):</div>
+   
+            <!-- --- ЛІТЕРА A --- -->
+            <div class="mutation-item m-alien-shard"><input type="checkbox" class="mutation-check" value="5.00" onchange="calculateTotal()"> Alien Shard</div>
+            <div class="mutation-item m-alien-weather"><input type="checkbox" class="mutation-check" value="5.50" onchange="calculateTotal()"> Alien Weather</div>
+            <div class="mutation-item m-ascended"><input type="checkbox" class="mutation-check" value="7.50" onchange="calculateTotal()"> Ascended</div>
+            <div class="mutation-item m-aurora"><input type="checkbox" class="mutation-check" value="3.50" onchange="calculateTotal()"> Aurora</div>
+
+            <!-- --- ЛІТЕРА C --- -->
+            <div class="mutation-item m-cleansing"><input type="checkbox" class="mutation-check" value="5.50" onchange="calculateTotal()"> Cleansing</div>
+            <div class="mutation-item m-corrupted"><input type="checkbox" class="mutation-check" value="6.00" onchange="calculateTotal()"> Corrupted</div>
+
+            <!-- --- ЛІТЕРА D --- -->
+            <div class="mutation-item m-dawnbound"><input type="checkbox" class="mutation-check" value="8.00" onchange="calculateTotal()"> Dawnbound</div>
+
+            <!-- --- ЛІТЕРА E --- -->
+            <div class="mutation-item m-everchanted"><input type="checkbox" class="mutation-check" value="9.50" onchange="calculateTotal()"> Everchanted</div>
+            <div class="mutation-item m-exalted"><input type="checkbox" class="mutation-check" value="6.50" onchange="calculateTotal()"> Exalted</div>
+
+            <!-- --- ЛІТЕРА F --- -->
+            <div class="mutation-item m-forger"><input type="checkbox" class="mutation-check" value="6.00" onchange="calculateTotal()"> Forger</div>
+            <div class="mutation-item m-frozen"><input type="checkbox" class="mutation-check" value="1.50" onchange="calculateTotal()"> Frozen</div>
+
+            <!-- --- ЛІТЕРА G --- -->
+                        <!-- --- ЛІТЕРА G --- -->
+            <div class="mutation-item m-galactic"><input type="checkbox" class="mutation-check" value="4.20" onchange="calculateTotal()"> Galactic </div>
+            <div class="mutation-item m-giantbean"><input type="checkbox" class="mutation-check" value="3.50" onchange="calculateTotal()"> Giantbean </div>
+            <div class="mutation-item m-gigantic"><input type="checkbox" class="mutation-check" value="6.00" onchange="calculateTotal()"> Gigantic</div>
+            <div class="mutation-item m-glimmering"><input type="checkbox" class="mutation-check" value="3.00" onchange="calculateTotal()"> Glimmering </div>
+            <div class="mutation-item m-gold"><input type="checkbox" class="mutation-check" value="1.80" onchange="calculateTotal()"> Gold </div>
+            <div class="mutation-item m-golden"><input type="checkbox" class="mutation-check" value="1.80" onchange="calculateTotal()"> Golden </div>
+
+            <!-- --- ЛІТЕРА H --- -->
+            <div class="mutation-item m-hyperhunger"><input type="checkbox" class="mutation-check" value="4.50" onchange="calculateTotal()"> HyperHunger</div>
+
+            <!-- --- ЛІТЕРА I --- -->
+            <div class="mutation-item m-inverted"><input type="checkbox" class="mutation-check" value="1.40" onchange="calculateTotal()"> Inverted</div>
+            <div class="mutation-item m-iridescent"><input type="checkbox" class="mutation-check" value="5.80" onchange="calculateTotal()"> Iridescent</div>
+            <div class="mutation-item m-ironskin"><input type="checkbox" class="mutation-check" value="1.60" onchange="calculateTotal()"> IronSkin</div>
+
+            <!-- --- ЛІТЕРА J --- -->
+            <div class="mutation-item m-jumbo"><input type="checkbox" class="mutation-check" value="3.20" onchange="calculateTotal()"> Jumbo</div>
+
+            <!-- --- ЛІТЕРА M --- -->
+            <div class="mutation-item m-mega"><input type="checkbox" class="mutation-check" value="2.00" onchange="calculateTotal()"> Mega</div>
+
+            <!-- --- ЛІТЕРА N --- -->
+            <div class="mutation-item m-nightmare"><input type="checkbox" class="mutation-check" value="4.00" onchange="calculateTotal()"> Nightmare</div>
+            <div class="mutation-item m-nocturnal"><input type="checkbox" class="mutation-check" value="4.50" onchange="calculateTotal()"> Nocturnal</div>
+            <div class="mutation-item m-nutty"><input type="checkbox" class="mutation-check" value="2.20" onchange="calculateTotal()"> Nutty</div>
+
+            <!-- --- ЛІТЕРА R --- -->
+            <div class="mutation-item m-radiant"><input type="checkbox" class="mutation-check" value="4.00" onchange="calculateTotal()"> Radiant</div>
+            <div class="mutation-item m-royaljelly"><input type="checkbox" class="mutation-check" value="5.00" onchange="calculateTotal()"> RoyalJelly</div>
+
+            <!-- --- ЛІТЕРА S --- -->
+            <div class="mutation-item m-shiny"><input type="checkbox" class="mutation-check" value="1.00" onchange="calculateTotal()"> Shiny</div>
+
+            <!-- --- ЛІТЕРА T --- -->
+            <div class="mutation-item m-tiny"><input type="checkbox" class="mutation-check" value="1.30" onchange="calculateTotal()"> Tiny</div>
+            <div class="mutation-item m-transcendent"><input type="checkbox" class="mutation-check" value="7.00" onchange="calculateTotal()"> Transcendent</div>
+
+            <!-- --- ЛІТЕРА U --- -->
+            <div class="mutation-item m-ufo"><input type="checkbox" class="mutation-check" value="4.00" onchange="calculateTotal()"> UFO</div>
+
+            <!-- --- ЛІТЕРА V --- -->
+            <div class="mutation-item m-venom"><input type="checkbox" class="mutation-check" value="5.00" onchange="calculateTotal()"> Venom</div>
+
+            <!-- --- ЛІТЕРА W --- -->
+            <div class="mutation-item m-windy"><input type="checkbox" class="mutation-check" value="1.10" onchange="calculateTotal()"> Windy</div>
+        </div>
+
+        <div class="result-box">
+            <div id="resultOutput" class="result"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Повна канонічна база петів
+const growAGardenPets = {
+"albino peacock": { gamePrice: "Exotic Egg (Secret Drop)", realPrice: "$45.00" },
+
+"alligator": { gamePrice: "Swampy Update (Legendary)", realPrice: "$50.00" },
+"amethyst beetle": { gamePrice: "Bug Egg (Mythical Rarity)", realPrice: "$38.00" },
+"ancient golem": { gamePrice: "Deep Caves Update / Legendary", realPrice: "$50.00" },
+"anglerfish": { gamePrice: "Ocean Depths Update", realPrice: "$12.00" },
+"angora goat": { gamePrice: "Farm Update Egg", realPrice: "$15.00" },
+"ankylosaurus": { gamePrice: "Dino Egg (Mythical S)", realPrice: "$70.00" },
+"anubis": { gamePrice: "Desert Tomb Event (Divine)", realPrice: "$140.00" },
+"apple gazelle": { gamePrice: "Orchard Update Spawns", realPrice: "$18.00" },
+"arctic fox": { gamePrice: "Winter Ice Egg", realPrice: "$14.00" },
+"armadillo": { gamePrice: "Desert Update Spawns", realPrice: "$6.00" },
+"ash raven": { gamePrice: "Volcano Ash Event", realPrice: "$28.00" },
+"astral stag": { gamePrice: "Starlight Ritual Event (Mythical S+)", realPrice: "$90.00" },
+"axolotl": { gamePrice: "Aquarium Chest Reward", realPrice: "$25.00" },
+"bacon pig": { gamePrice: "Meme Egg / Limited", realPrice: "$20.00" },
+"badger": { gamePrice: "Woodland Update Spawns", realPrice: "$6.50" },
+"bagel bunny": { gamePrice: "Gourmet Egg Spawns", realPrice: "$12.00" },
+"baku": { gamePrice: "Zen Egg (Mythical Spirit)", realPrice: "$85.00" },
+"bald eagle": { gamePrice: "Summit Update / Legendary", realPrice: "$45.00" },
+"barn owl": { gamePrice: "Fall Egg (XP Multiplier)", realPrice: "$18.50" },
+"bat": { gamePrice: "Spooky Update Spawns", realPrice: "$3.50" },
+"beanstalk bear": { gamePrice: "Fart Can Event Leak", realPrice: "$55.00" },
+"bear": { gamePrice: "5,000,000 Sheckles", realPrice: "$50.00" },
+"bear bee": { gamePrice: "Bee Egg (Mythical)", realPrice: "$40.00" },
+"bear on bike": { gamePrice: "Arcade Ticket Shop", realPrice: "$50.00" },
+"beaver": { gamePrice: "River Update Spawns", realPrice: "$5.00" },
+"bee": { gamePrice: "1,000,000 Sheckles", realPrice: "$10.00" },
+"black bunny": { gamePrice: "35,000 Sheckles", realPrice: "$0.35" },
+"black dragon": { gamePrice: "Dragon Forge Update (Divine Overlord)", realPrice: "$220.00" },
+"blood hedgehog": { gamePrice: "Blood Shop Exclusive", realPrice: "$14.00" },
+"blood kiwi": { gamePrice: "Special Harvest Event Exclusive", realPrice: "$15.00" },
+"blood owl": { gamePrice: "Крафт / Блад Мун Магазин", realPrice: "$3.00" },
+"blue whale": { gamePrice: "Premium Tier Ocean DLC Pack", realPrice: "$110.00" },
+"brontosaurus": { gamePrice: "Prehistoric Dino Egg (Divine)", realPrice: "$165.00" },
+"brown mouse": { gamePrice: "Common Egg Spawns", realPrice: "$0.50" },
+"bunny": { gamePrice: "20,000 Sheckles", realPrice: "$0.20" },
+"butterfly": { gamePrice: "Anti Bee Egg (Mythical)", realPrice: "$45.00" },
+"capybara": { gamePrice: "Paradise Egg Event", realPrice: "$2.50" },
+"cat": { gamePrice: "20,000 Sheckles", realPrice: "$0.20" },
+"caterpillar": { gamePrice: "Bug Egg Spawns", realPrice: "$12.00" },
+"chameleon": { gamePrice: "Tropical Update (Rare)", realPrice: "$16.00" },
+"chicken": { gamePrice: "22,000 Sheckles", realPrice: "$0.22" },
+"chicken zombie": { gamePrice: "Halloween Shop (25x Value)", realPrice: "$30.00" },
+"chinchilla": { gamePrice: "Nutty Chest (Returns egg on sale)", realPrice: "$40.00" },
+"chipmunk": { gamePrice: "Fall Market (6.35% chance to save Tool charge)", realPrice: "$5.00" },
+"chocolate lab": { gamePrice: "Sugar Egg (Uncommon 29%)", realPrice: "$1.50" },
+"cloud hound": { gamePrice: "Cloud Touch Update", realPrice: "$40.00" },
+"cooked owl": { gamePrice: "Код з м'якої іграшки PhatMojo", realPrice: "$5.00" },
+"corrupted kitsune": { gamePrice: "Chakra Mutation Update", realPrice: "$250.00" },
+"corrupted kodama": { gamePrice: "Zen Egg (Legendary Spirit)", realPrice: "$80.00" },
+"cosmic wolf": { gamePrice: "Galaxy Egg (Mythic Rarity)", realPrice: "$45.00" },
+"cow": { gamePrice: "Legendary Egg (42%)", realPrice: "$6.00" },
+"crab": { gamePrice: "12,000 Sheckles", realPrice: "$0.12" },
+"crocodile": { gamePrice: "Safari Shop (Bonus XP + Fast growth)", realPrice: "$55.00" },
+"crow": { gamePrice: "Grave Digging Event (Spooky Growth Buff)", realPrice: "$2.50" },
+"cyber hound": { gamePrice: "Neo-Neon Update (0.1% chance)", realPrice: "$75.00" },
+"dairy cow": { gamePrice: "Farm Update / Mythical Egg", realPrice: "$12.00" },
+"dark spriggan": { gamePrice: "Creepy Critters Shop (Necrotic)", realPrice: "$70.00" },
+"deer": { gamePrice: "50,000 Sheckles", realPrice: "$0.50" },
+"diamond dragonfly": { gamePrice: "Ексклюзивний Plushie Code DLC", realPrice: "$60.00" },
+"dilophosaurus": { gamePrice: "Динозаврячий Івент", realPrice: "$1.50" },
+"disco bee": { gamePrice: "Divine Egg Shop (125x Value)", realPrice: "$140.00" },
+"dog": { gamePrice: "Безкоштовний / Стартовий", realPrice: "$0.00" },
+"dragonfly": { gamePrice: "Bug Egg (Divine Rarity)", realPrice: "$95.00" },
+"fennic fox": { gamePrice: "Івент Mega Harvest", realPrice: "$4.50" },
+"fire wisp": { gamePrice: "Volcano Live Event", realPrice: "$45.00" },
+"firefly": { gamePrice: "Night Merchant (Rare)", realPrice: "$8.00" },
+"flamingo": { gamePrice: "Tropical Update Egg (Legendary)", realPrice: "$35.00" },
+"fortune squirrel": { gamePrice: "Chubby Chipmunk Event Track (Fortune mutation)", realPrice: "$95.00" },
+"frog": { gamePrice: "10,000 Sheckles", realPrice: "$0.10" },
+"gargoyle": { gamePrice: "Haunted Egg (9.5% шанс) / Halloween Event", realPrice: "$65.00" },
+"ghostly gargoyle": { gamePrice: "Premium Spooky Chest (Secret Drop)", realPrice: "$135.00" },
+"ghostly headless horseman": { gamePrice: "Premium Spooky Chest (Secret)", realPrice: "$95.00" },
+"ghostly spider": { gamePrice: "Premium Spooky Chest (Secret End-game)", realPrice: "$240.00" },
+"giant ant": { gamePrice: "Bug Egg (10% chance to duplicate)", realPrice: "$28.00" },
+"gnome": { gamePrice: "Gnome Merchant Exclusive", realPrice: "$25.00" },
+"golden dragonfly": { gamePrice: "9,000,000 Sheckles", realPrice: "$90.00" },
+"golden goose": { gamePrice: "Golden Crop Update Exclusive", realPrice: "$165.00" },
+"golden lab": { gamePrice: "15,000 Sheckles", realPrice: "$0.15" },
+"golem": { gamePrice: "Deep Caves (Base Variant)", realPrice: "$20.00" },
+"grave crab": { gamePrice: "Spooky Update / 10k Coins", realPrice: "$1.20" },
+"grey mouse": { gamePrice: "Common Egg Spawns", realPrice: "$0.50" },
+"griffin": { gamePrice: "Skyroot Chest (Cyclonic Mutation)", realPrice: "$85.00" },
+"grizzly bear": { gamePrice: "Fall Egg Combat Pet", realPrice: "$35.00" },
+"haunted knight": { gamePrice: "Halloween Event / Spooky Chest", realPrice: "$45.00" },
+"hazehound": { gamePrice: "Fall Harvest (Mythical Cloud Mutation)", realPrice: "$110.00" },
+"headless horseman": { gamePrice: "Spooky Egg (0.5% шанс) / Halloween", realPrice: "$40.00" },
+"hedgehog": { gamePrice: "350,000 Sheckles", realPrice: "$3.50" },
+"hermit crab": { gamePrice: "Beach Update Spawns", realPrice: "$4.00" },
+"hippo": { gamePrice: "Safari Shop (Mythical Tier / Heavy Harvester)", realPrice: "$70.00" },
+"hippocampus": { gamePrice: "Ocean Depths Update (Divine Rarity)", realPrice: "$160.00" },
+"honey badger": { gamePrice: "Savannah Pack Update", realPrice: "$24.00" },
+"honey bee": { gamePrice: "150,000 Sheckles", realPrice: "$1.50" },
+"hootsie roll": { gamePrice: "Gourmet Egg (Mythical)", realPrice: "$75.00" },
+"hummingbird": { gamePrice: "Flower Garden Update", realPrice: "$15.00" },
+"hyacinth macaw": { gamePrice: "Jungle Egg / Exotic", realPrice: "$35.00" },
+"hyena": { gamePrice: "Savannah Pack Update", realPrice: "$4.00" },
+"hyrax": { gamePrice: "Savannah Pack Update", realPrice: "$7.50" },
+"ice golem": { gamePrice: "Prismatic Tournament Reward", realPrice: "$110.00" },
+"ice serpent": { gamePrice: "Топ-100 Нагорода Guild Rank", realPrice: "$85.00" },
+"idol chipmunk": { gamePrice: "Concert Event Track", realPrice: "$55.00" },
+"iguana": { gamePrice: "Goliath's Goods Shop (24% chance)", realPrice: "$14.00" },
+"iguanodon": { gamePrice: "Dino Egg (Legendary 32%)", realPrice: "$20.00" },
+"imp": { gamePrice: "Lumina Fairy Fare Chest (Rare 15%)", realPrice: "$18.00" },
+"jackalope": { gamePrice: "2,500,000 Sheckles", realPrice: "$25.00" },
+"jandel monkey": { gamePrice: "10,000,000 Sheckles", realPrice: "$100.00" },
+"jellyfish": { gamePrice: "Ocean Depths Egg (Uncommon)", realPrice: "$2.50" },
+"jerboa": { gamePrice: "Desert Update Spawns", realPrice: "$4.50" },
+"kitsune": { gamePrice: "12,500,000 Sheckles / Super Rare", realPrice: "$180.00" },
+"kodama": { gamePrice: "Zen Egg (Base Spirit)", realPrice: "$15.00" },
+"lantern wisp": { gamePrice: "Night Merchant / Lantern Festival", realPrice: "$25.00" },
+"lobster thermidor": { gamePrice: "Gourmet Event (Divine Masterpiece)", realPrice: "$195.00" },
+"luminous sprite": { gamePrice: "Lumina Fairy Fares Shop (Luminous Mutation)", realPrice: "$60.00" },
+"lunar moth": { gamePrice: "Galaxy Egg (Mythical Glow Buff)", realPrice: "$45.00" },
+"magma turtle": { gamePrice: "Volcano Live Event (Limit Edition)", realPrice: "$60.00" },
+"mallard": { gamePrice: "Fall Egg Spawns", realPrice: "$5.50" },
+"maneki-neko": { gamePrice: "New Year Event (Fortune Cat)", realPrice: "$12.00" },
+"manta ray": { gamePrice: "Summer Update Part 2 (Tidal Boost)", realPrice: "$22.00" },
+"marmot": { gamePrice: "Fall Egg Spawns", realPrice: "$6.00" },
+"mimic octopus": { gamePrice: "Paradise Egg (Ability Copier)", realPrice: "$65.00" },
+"monkey": { gamePrice: "3,000,000 Sheckles", realPrice: "$30.00" },
+"moon cat": { gamePrice: "Galaxy Egg Spawns", realPrice: "$30.00" },
+"moon snail": { gamePrice: "Night Merchant (Lucky Harvest)", realPrice: "$9.00" },
+"moth": { gamePrice: "Anti Bee Egg (Legendary)", realPrice: "$24.00" },
+"nebula cat": { gamePrice: "Galaxy Egg (Секретний шанс 0.05%)", realPrice: "$85.00" },
+"new year's bird": { gamePrice: "New Year Event Exclusive (Launches fireworks)", realPrice: "$15.00" },
+"new year's dragon": { gamePrice: "New Year Egg (Fireworks mutation)", realPrice: "$115.00" },
+"nihonzaru": { gamePrice: "Zen Egg (Rare Snow Monkey)", realPrice: "$25.00" },
+"orange tabby": { gamePrice: "40,000 Sheckles", realPrice: "$0.40" },
+"orangutan": { gamePrice: "Jungle Update / Legendary", realPrice: "$40.00" },
+"ostrich": { gamePrice: "Paradise Egg (Legendary)", realPrice: "$12.00" },
+"owl": { gamePrice: "25,000 Sheckles", realPrice: "$0.25" },
+"pack bee": { gamePrice: "Crafted (Anti-Bee Egg + Flowers)", realPrice: "$50.00" },
+"pancake mole": { gamePrice: "Gourmet Pet Egg (Digs gear)", realPrice: "$35.00" },
+"panda": { gamePrice: "Bamboo Forest Update", realPrice: "$35.00" },
+"peacock": { gamePrice: "Paradise Egg (Cooldown Reduction)", realPrice: "$15.00" },
+"pelican": { gamePrice: "Summer Update Part 2 (Rare)", realPrice: "$8.00" },
+"penguin": { gamePrice: "Winter Ice Egg (Uncommon)", realPrice: "$4.00" },
+"petal bee": { gamePrice: "Bee Egg (Legendary)", realPrice: "$18.00" },
+"pig": { gamePrice: "45,000 Sheckles", realPrice: "$0.45" },
+"pigeon": { gamePrice: "City Rooftops Mini-Event", realPrice: "$3.50" },
+"pink bunny": { gamePrice: "Buttercup Muncher Event (Drops seeds)", realPrice: "$4.00" },
+"platypus": { gamePrice: "Swampy Update Exclusive", realPrice: "$18.00" },
+"polar bear": { gamePrice: "Legendary Egg Spawns", realPrice: "$10.00" },
+"praying mantis": { gamePrice: "Bug Egg / Rare", realPrice: "$15.00" },
+"prismatic pegasus": { gamePrice: "Sky Kingdom Top Tier Drop", realPrice: "$210.00" },
+"pterodactyl": { gamePrice: "Dino Egg (Legendary S+)", realPrice: "$55.00" },
+"pumpkin rat": { gamePrice: "Creepy Critters Shop (Cosmetic variant maker)", realPrice: "$12.00" },
+"queen bee": { gamePrice: "Divine Bee Shooting Gallery", realPrice: "$85.00" },
+"raccoon": { gamePrice: "15,000,000 Sheckles", realPrice: "$150.00" },
+"red cap": { gamePrice: "Woodland Update / Secret Mushroom Cave", realPrice: "$18.00" },
+"red fox": { gamePrice: "Woodland Update / Rare", realPrice: "$12.00" },
+"red giant ant": { gamePrice: "Mythical Egg (Crop Duplicate)", realPrice: "$32.00" },
+"reaper": { gamePrice: "Spooky Egg Shop (Takes fruits, gives XP/CD Skip)", realPrice: "$45.00" },
+"robin": { gamePrice: "75,000 Sheckles", realPrice: "$0.75" },
+"rooster": { gamePrice: "45,000 Sheckles", realPrice: "$0.45" },
+"salmon": { gamePrice: "River Fishing Update (Salmon School XP multi)", realPrice: "$3.00" },
+"sand snake": { gamePrice: "Desert Tomb Egg (Rare Spawns)", realPrice: "$14.00" },
+"scarab": { gamePrice: "Spooky Scarab Pack (Nearby plant size boost)", realPrice: "$8.00" },
+"scarlet macaw": { gamePrice: "Paradise Egg (Legendary)", realPrice: "$18.00" },
+"sea anemone": { gamePrice: "Ocean Reef Update", realPrice: "$14.00" },
+"seagull": { gamePrice: "15,000 Sheckles", realPrice: "$0.15" },
+"sea otter": { gamePrice: "Legendary Egg Spawns", realPrice: "$8.00" },
+"sea turtle": { gamePrice: "500,000 Sheckles", realPrice: "$5.00" },
+"sea urchin": { gamePrice: "Ocean Reef Update", realPrice: "$8.50" },
+"seal": { gamePrice: "Winter Ice Egg Spawns", realPrice: "$10.00" },
+"shadow dragon": { gamePrice: "Fall Harvest update (Super Rare Veil x50)", realPrice: "$280.00" },
+"shadow phoenix": { gamePrice: "Eclipse Merchant (Секретний обмін)", realPrice: "$175.00" },
+"silver monkey": { gamePrice: "3,000,000 Sheckles (Alternative)", realPrice: "$30.00" },
+"skull snail": { gamePrice: "Spooky Egg (Rare Drop)", realPrice: "$18.00" },
+"sloth": { gamePrice: "Tropical Update (Mythical)", realPrice: "$38.00" },
+"smithing dog": { gamePrice: "Cybernetic Forge Shop", realPrice: "$65.00" },
+"snail": { gamePrice: "Bug Egg Spawns", realPrice: "$8.50" },
+"snow leopard": { gamePrice: "Winter Ice Egg (Legendary)", realPrice: "$45.00" },
+"snowman soldier": { gamePrice: "Winter Event Track", realPrice: "$40.00" },
+"skunk": { gamePrice: "Woodland Update Spawns", realPrice: "$5.00" },
+"solar griffin": { gamePrice: "Solar Eclipse Event Track (Divine)", realPrice: "$120.00" },
+"space squirrel": { gamePrice: "Fall Pets Shop (Voidtouched)", realPrice: "$45.00" },
+"spinosaurus": { gamePrice: "Dino Egg (Divine Rarity)", realPrice: "$135.00" },
+"spotted deer": { gamePrice: "50,000 Sheckles (Variant)", realPrice: "$0.50" },
+"spriggan": { gamePrice: "Goliath's Goods (Bloom Mutation chance)", realPrice: "$40.00" },
+"squirrel": { gamePrice: "Mythical Egg (Rare drop)", realPrice: "$22.00" },
+"stag beetle": { gamePrice: "Bug Egg (Legendary Attacker)", realPrice: "$32.00" },
+"starfish": { gamePrice: "18,000 Sheckles", realPrice: "$0.18" },
+"stegosaurus": { gamePrice: "Prehistoric Dino Egg Spawns", realPrice: "$22.00" },
+"sugar bunny": { gamePrice: "Sugar Egg (Common 49%)", realPrice: "$0.50" },
+"sugar glider": { gamePrice: "Fall Pets Shop (Mythical)", realPrice: "$35.00" },
+"swan": { gamePrice: "1,500,000 Sheckles", realPrice: "$15.00" },
+"t-rex": { gamePrice: "Dino Egg (Divine Overlord)", realPrice: "$150.00" },
+"tancho zuru": { gamePrice: "Zen Egg (Tranquil Mutation)", realPrice: "$65.00" },
+"tarantula hawk": { gamePrice: "Anti Bee Egg (Legendary)", realPrice: "$26.00" },
+"termite": { gamePrice: "Bug Egg Spawns", realPrice: "$2.00" },
+"titanium dragon": { gamePrice: "Cybernetic Forge Crafting (Divine)", realPrice: "$155.00" },
+"toucan": { gamePrice: "Tropical Egg / Rare Drop", realPrice: "$14.00" },
+"turkey": { gamePrice: "Autumn Harvest Event", realPrice: "$25.00" },
+"turtle": { gamePrice: "Classic Pond Update", realPrice: "$8.00" },
+"unicorn": { gamePrice: "12,000,000 Sheckles", realPrice: "$120.00" },
+"void overseer": { gamePrice: "Void Rift Event (Ультра-рідкісний бос)", realPrice: "$130.00" },
+"walrus": { gamePrice: "Winter Ice Egg (Rare)", realPrice: "$14.00" },
+"wasp": { gamePrice: "200,000 Sheckles", realPrice: "$2.00" },
+"wind wyvern": { gamePrice: "PhatMojo Toy Code DLC", realPrice: "$75.00" },
+"wolpertinger": { gamePrice: "Mythical Egg (Secret 0.02% Drop)", realPrice: "$180.00" },
+"gecko": { gamePrice: "Safari Egg (Common Drop)", realPrice: "$0.10" },
+"ladybug": { gamePrice: "Bug Egg (Common / Flower Growth Buff)", realPrice: "$0.15" },
+"oxpecker": { gamePrice: "Safari Egg (Common Support)", realPrice: "$0.12" },
+"triceratops": { gamePrice: "Dino Egg (Uncommon Tier)", realPrice: "$1.50" },
+"mole": { gamePrice: "Night Egg Spawns (Base Variant)", realPrice: "$0.50" },
+"kiwi": { gamePrice: "Exotic Egg Standard Drop", realPrice: "$4.00" },
+"night owl": { gamePrice: "Night Merchant Exclusive (XP Bonus)", realPrice: "$25.00" },
+"echo frog": { gamePrice: "Crafted Mutation Frog", realPrice: "$18.00" },
+"angelic guardian": { gamePrice: "Divine Egg Shop / Secret Raid Reward", realPrice: "$210.00" },
+"sun god bird": { gamePrice: "Divine Tier / Solar Ritual Event", realPrice: "$165.00" },
+"moon rabbit": { gamePrice: "Galaxy Egg (Top Divine Drop)", realPrice: "$180.00" },
+"water buffalo": { gamePrice: "Swampy Update (End-game Meta Value)", realPrice: "$115.00" },
+"rainbow elephant": { gamePrice: "Special Festival Event / Limited Shop", realPrice: "$95.00" },
+"ghostly mummy": { gamePrice: "Halloween Spooky Chest (Rare Limit)", realPrice: "$35.00" },
+"bearded dragon": { gamePrice: "Desert Reptile Pack Spawns", realPrice: "$12.00" },
+"white tiger": { gamePrice: "Ексклюзивний Plushie Toy DLC Code", realPrice: "$85.00" },
+"red panda": { gamePrice: "Autumn Harvest Shop (Divine Tier)", realPrice: "$130.00" },
+"moon dragon": { gamePrice: "Lunar Event / Cosmic Egg Exclusive", realPrice: "$145.00" },
+"blue lobster": { gamePrice: "Ocean Depths Update (Legendary Meme Drop)", realPrice: "$55.00" },
+"black swan": { gamePrice: "Elegant Update / Crafted Variant", realPrice: "$45.00" },
+"hydra": { gamePrice: "Volcano Depths / Mythical Boss Drop", realPrice: "$85.00" },
+"llama": { gamePrice: "Farm & Mountain Update (Legendary)", realPrice: "$28.00" },
+        "badger": { gamePrice: "Woodland Update Spawns", realPrice: "$6.50" },
+        "barn owl": { gamePrice: "Fall Egg (XP Multiplier)", realPrice: "$18.50" },
+        "enfield": { gamePrice: "Autumn Egg (0.5% Chance) / Fall Market 2026", realPrice: "$165.00" },
+        "robin": { gamePrice: "75,000 Sheckles", realPrice: "$0.75" },
+        "skunk": { gamePrice: "Woodland Update Spawns / Autumn Egg (35%)", realPrice: "$5.00" },
+        "swan": { gamePrice: "1,500,000 Sheckles", realPrice: "$15.00" },
+                "bat": { gamePrice: "Spooky Update Spawns", realPrice: "$3.50" },
+        "black cat": { gamePrice: "Halloween Shop (Witch's Brew Ingredient)", realPrice: "$16.00" },
+        "bone dog": { gamePrice: "Grave Digging Event (Rare Drop)", realPrice: "$15.00" },
+        "candle turtle": { gamePrice: "Spooky Egg (Wax Aura Boost)", realPrice: "$24.00" },
+        "dark spriggan": { gamePrice: "Creepy Critters Shop (Necrotic)", realPrice: "$70.00" },
+        "frankenstein's bear": { gamePrice: "Lab Crafting Event (Mythical)", realPrice: "$85.00" },
+        "ghost bear": { gamePrice: "Haunted Chest (Secret Spirit Drop)", realPrice: "$110.00" },
+        "goat": { gamePrice: "Classic Farm Egg Drop", realPrice: "$3.50" },
+        "grave crab": { gamePrice: "Spooky Update / 10k Coins", realPrice: "$1.20" },
+        "hex serpent": { gamePrice: "Curse Ritual Event (Divine Tier)", realPrice: "$145.00" },
+        "mothman": { gamePrice: "Cryptid Update (0.05% Chance Drop)", realPrice: "$130.00" },
+        "pumpkin piggy": { gamePrice: "Halloween Event Track Reward", realPrice: "$18.00" },
+        "pumpkin rat": { gamePrice: "Creepy Critters Shop (Cosmetic variant maker)", realPrice: "$12.00" },
+        "reaper": { gamePrice: "Spooky Egg Shop (Takes fruits, gives XP/CD Skip)", realPrice: "$45.00" },
+        "spider": { gamePrice: "Web Spinning Mini-Event Spawns", realPrice: "$2.50" },
+        "wolf": { gamePrice: "Full Moon Event (Night Damage Combat Pet)", realPrice: "$35.00" },
+                "cardinal": { gamePrice: "Winter Forest Spawns (Common Drop)", realPrice: "$0.80" },
+        "cockatrice": { gamePrice: "Mythical Egg (0.7% Chance) / Legendary Attacker", realPrice: "$75.00" },
+        "crow": { gamePrice: "Grave Digging Event (Spooky Growth Buff)", realPrice: "$2.50" },
+        "frankenstein's bear": { gamePrice: "Lab Crafting Event (Mythical)", realPrice: "$85.00" },
+        "glimmering sprite": { gamePrice: "Lumina Fairy Fare Chest (Glimmering Event)", realPrice: "$45.00" },
+        "goblin": { gamePrice: "Deep Caves Merchant / Rare Raider Pack", realPrice: "$16.00" },
+        "grave crab": { gamePrice: "Spooky Update / 10k Coins", realPrice: "$1.20" },
+        "imp": { gamePrice: "Lumina Fairy Fare Chest (Rare 15%)", realPrice: "$18.00" },
+        "ladybug": { gamePrice: "Bug Egg (Common / Flower Growth Buff)", realPrice: "$0.15" },
+        "phoenix": { gamePrice: "Volcano Live Event (Divine Tier Overlord)", realPrice: "$180.00" },
+        "pixie": { gamePrice: "Flower Garden Update / Lumina Chest (Rare)", realPrice: "$14.00" },
+        "shroomie": { gamePrice: "Woodland Update / Secret Mushroom Spawns", realPrice: "$8.50" },
+        "the fairy": { gamePrice: "Lumina Fairy Fares Shop (Divine Support)", realPrice: "$135.00" },
+                "bear bee": { gamePrice: "Bee Egg Exclusive (Rare Hybrid)", realPrice: "$22.00" },
+        "brontosaurus": { gamePrice: "Prehistoric Jurassic Egg (Legendary)", realPrice: "$60.00" },
+        "glimmering sprite": { gamePrice: "Lumina Fairy Fare Chest (Glimmering Event)", realPrice: "$45.00" },
+        "red giant ant": { gamePrice: "Underground Colony Update (Uncommon)", realPrice: "$4.50" },
+        "snail": { gamePrice: "10,000 Sheckles / Common Backyard Drop", realPrice: "$0.10" },
+"specter": { gamePrice: "Halloween Merchant (31,300,000 Sheckles)", realPrice: "$120.00" },
+
+
+"cuckoo": { gamePrice: "Legendary Fall Egg (30% Chance)", realPrice: "$22.00" }
+};
+let currentPetKey = null;
+function checkPet() {
+const playerInput = document.getElementById("petInput").value;
+const resultOutput = document.getElementById("resultOutput");
+const mutationsContainer = document.getElementById("mutationsContainer");
+const petName = playerInput.trim().toLowerCase();
+if (petName === "") {
+resultOutput.innerHTML = "Please enter the pet's name!";
+resultOutput.className = "result error";
+mutationsContainer.style.display = "none";
+return;
+}
+if (petName in growAGardenPets) {
+currentPetKey = petName;
+const checkboxes = document.querySelectorAll('.mutation-check');
+checkboxes.forEach(box => box.checked = false);
+mutationsContainer.style.display = "block";
+
+calculateTotal();
+} else {
+currentPetKey = null;
+resultOutput.innerHTML = "In the game Grow a Garden, there is no such pet.";
+resultOutput.className = "result error";
+mutationsContainer.style.display = "none";
+return;
+}
+}
+function calculateTotal() {
+    if (!currentPetKey) return;
+
+    const petData = growAGardenPets[currentPetKey];
+    const resultOutput = document.getElementById("resultOutput");
+    const playerInput = document.getElementById("petInput").value.trim();
+    
+    // Отримуємо значення віку та ваги
+    const age = parseInt(document.getElementById("petAge").value) || 0;
+    const weight = parseInt(document.getElementById("petWeight").value) || 0;
+
+    let base = 0;
+    if (petData.realPrice !== undefined) {
+        base = parseFloat(String(petData.realPrice).replace('$', ''));
+    }
+    if (isNaN(base)) base = 0;
+
+    let totalPrice = base;
+    let selectedMutations = [];
+    
+    // Рахуємо мутації (додаємо до бази)
+    const checkboxes = document.querySelectorAll('.mutation-check');
+    checkboxes.forEach(box => {
+        if (box.checked) {
+            totalPrice += parseFloat(box.value);
+            let text = box.nextSibling.textContent.trim();
+            selectedMutations.push(text);
+        }
+    });
+
+      // НОВА ЗБАЛАНСОВАНА ФОРМУЛА:
+    // Коефіцієнт віку: кожний рік додає лише +1% до ціни (замість 5%)
+    const ageFactor = 1.0 + (age * 0.01);
+    
+    // Коефіцієнт ваги: кожний кг додає лише +0.5% до ціни (замість 2%)
+    const weightFactor = 1.0 + (weight * 0.005);
+
+    
+    // Кінцева вартість помножується на коефіцієнти (ТЕПЕР ВИПРАВЛЕНО!)
+   totalPrice = totalPrice * ageFactor * weightFactor;
+
+    const mutationColors = { 
+        "alien shard": "#00ccaa", "alien weather": "#20b2aa", "ascended": "#ff007f", "aurora": "#00aaaa", 
+        "cleansing": "#00b0b0", "corrupted": "#9400d3", "dawnbound": "#ff7f50", "everchanted": "#da70d6", 
+        "exalted": "#ba55d3", "forger": "#ff4500", "frozen": "#1e90ff", "gigantic": "#cd5c5c", 
+        "hyperhunger": "#cc0000", "inverted": "#708090", "iridescent": "#ff00ff", "iron skin": "#506070", 
+        "jumbo": "#4682b4", "mega": "#ff1493", "nightmare": "#8b0000", "nocturnal": "#191970", 
+        "nutty": "#d2691e", "radiant": "#b8860b", "royaljelly": "#ffaa00", "shiny": "#888888", 
+        "tiny": "#40a0a0", "transcendent": "#9370db", "ufo": "#32cd32", "venom": "#228b22", "windy": "#6080a0" 
+    };
+
+    let mutationsText = ""; 
+    if (selectedMutations.length > 0) { 
+        const coloredList = selectedMutations.map(m => { 
+            const cleanName = m.toLowerCase().trim(); 
+            const color = mutationColors[cleanName] || "#333"; 
+            return `<span style="color: ${color}; font-weight: bold;">${m}</span>`; 
+        }).join(' + '); 
+        mutationsText = ` (${coloredList})`; 
+    }
+
+    resultOutput.innerHTML = `<span class="success">Pet found!</span><br>   
+    <span>Method of obtaining: <strong>${petData.gamePrice}</strong></span><br>   
+    <span class="price-tag">Total price for ${playerInput}${mutationsText}: <strong>$${totalPrice.toFixed(2)} USD</strong></span>`; 
+    
+    resultOutput.className = "result"; 
+}
+
+
+document.getElementById("petInput").addEventListener("keypress", function(event) { 
+    if (event.key === "Enter") { 
+        checkPet(); 
+    } 
+});
+</script>
+
+</body>
+</html>
